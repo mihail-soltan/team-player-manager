@@ -1,0 +1,41 @@
+<h1 mat-dialog-title>{{ data.action | titlecase }} {{ data.type | titlecase }}</h1>
+<div *ngIf="data.type === 'team'" mat-dialog-content class="team-dialog">
+  <mat-form-field aria-required="true" appearance="fill">
+    <mat-label>Enter a new name</mat-label>
+    <input matInput #input [(ngModel)]="teamName" required/>
+  </mat-form-field>
+  <button mat-flat-button color="primary" (click)="data.action==='edit'? editTeam(teamName, data.team.ID_ECHIPA) : addTeam()">
+    <span>{{ data.action | titlecase }} {{ data.type | titlecase }}</span>
+    <mat-icon aria-hidden="true" class="material-icons-outlined">send</mat-icon>
+  </button>
+</div>
+<div *ngIf="data.type === 'player'" mat-dialog-content class="team-dialog">
+    <mat-form-field aria-required="true" appearance="fill">
+      <mat-label>Enter a new first name</mat-label>
+      <input matInput #input [(ngModel)]="firstName" required/>
+    </mat-form-field>
+    <mat-form-field aria-required="true" appearance="fill">
+      <mat-label>Enter a new last name</mat-label>
+      <input matInput #input [(ngModel)]="lastName" required/>
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+        <mat-label>Enter a new date of birth</mat-label>
+        <input matInput [matDatepicker]="picker" [(ngModel)]="dateOfBirth" required>
+        <mat-hint>DD/MM/YYYY</mat-hint>
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Team</mat-label>
+        <mat-select [(ngModel)]="teamId" name="teams" required>
+          <mat-option *ngFor="let team of allTeams" [value]="team?.ID_ECHIPA">
+            {{team.DENUMIRE}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    <button mat-flat-button color="primary" (click)="data.action==='edit'?editPlayer():addPlayer()">
+      <span>{{ data.action | titlecase }} {{ data.type | titlecase }}</span>
+      <mat-icon aria-hidden="true" class="material-icons-outlined">send</mat-icon>
+    </button>
+  </div>
+

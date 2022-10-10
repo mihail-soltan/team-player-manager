@@ -1,0 +1,94 @@
+<div 
+  class="flex row justify-between align-center"
+  *ngIf="!!table_config?.ediTable?.add"
+  >
+      <button 
+          class="add-btn"
+          mat-raised-button
+          matRipple
+          color="primary"
+          matTooltip="Add New Row"
+          matTooltipPosition="right"
+          aria-label="Add New Row"
+          (click)="openAddDialog()"
+          >
+          Add New Team
+          <mat-icon class="material-icons">
+          playlist_add
+          </mat-icon>
+      </button>
+      <mat-checkbox (change)="onShowActive($event)">Show Active Teams</mat-checkbox>
+</div>
+<mat-form-field appearance="standard">
+  <mat-label>Filter</mat-label>
+  <input
+    matInput
+    (keyup)="applyFilter($event)"
+    placeholder="Ex. Boston Celtics"
+    #input
+  />
+</mat-form-field>
+
+<div class="mat-elevation-z8">
+  <table mat-table [dataSource]="dataSource" matSort>
+    <ng-container
+      *ngFor="let column of table_config.columns; index as i"
+      [matColumnDef]="column.key"
+    >
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>
+        {{ column.heading }}
+      </th>
+      <td mat-cell *matCellDef="let row" [ngClass]="{'green': row[column.key] ==='ACTIV', 'red': row[column.key]==='INACTIV'}">
+        
+          {{
+            isDate(row[column.key])
+              ? (row[column.key] | date: "mediumDate")
+              : row[column.key]
+          }}
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="ACTION">
+      <th mat-header-cell *matHeaderCellDef>Action</th>
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let row" class="row-action-column">
+        <button
+          mat-icon-button
+          matRipple
+          matTooltip="Edit Row"
+          matTooltipPosition="left"
+          aria-label="Edit Row"
+          (click)="onEditTeam(row)"
+        >
+          <mat-icon aria-hidden="true" class="material-icons-outlined"
+            >edit</mat-icon
+          >
+        </button>
+        <button
+          mat-icon-button
+          matRipple
+          matTooltip="Edit Row"
+          matTooltipPosition="left"
+          aria-label="Edit Row"
+          (click)="row.ACTIV ? deleteTeam(row) : restoreTeam(row)"
+        >
+          <mat-icon class="material-symbols-outlined">
+            {{ row.ACTIV ? "delete" : "settings_backup_restore" }}
+          </mat-icon>
+        </button>
+      </td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+
+    <tr class="mat-row" *matNoDataRow>
+      <td class="mat-cell" colspan="4">
+        No data matching the filter "{{ input.value }}"
+      </td>
+    </tr>
+  </table>
+  <mat-paginator
+    [pageSize]="5"
+    [pageSizeOptions]="[3, 5, 10]"
+    aria-label="Select page of teams"
+  ></mat-paginator>
+</div>
