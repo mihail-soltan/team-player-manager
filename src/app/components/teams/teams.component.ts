@@ -22,52 +22,42 @@ import { EditComponent } from '../edit/edit.component';
 export class TeamsComponent implements OnInit, AfterViewInit {
   teams: Team[] = [];
   displayedColumns: string[] = [
-    'STATUS',
-    'ID_ECHIPA',
-    'DENUMIRE',
-    'ACTIV',
-    'DATA_CREARE',
-    'UTILIZATOR_CREARE',
-    'DATA_MODIFICARE',
-    'UTILIZATOR_MODIFICARE',
+    'name',
+    'active',
+    'createdAt',
+    'createdBy',
+    'updatedAt',
+    'updatedBy',
     'ACTION',
   ];
   table_config = {
     columns: [
       {
-        key: 'STATUS',
-        heading: 'STATUS',
+        key: 'name',
+        heading: 'NAME',
       },
       {
-        key: 'ID_ECHIPA',
-        heading: 'ID ECHIPA',
+        key: 'active',
+        heading: 'ACTIVE',
       },
       {
-        key: 'DENUMIRE',
-        heading: 'DENUMIRE',
+        key: 'createdAt',
+        heading: 'CREATED AT',
       },
       {
-        key: 'ACTIV',
-        heading: 'ACTIV',
+        key: 'createdBy',
+        heading: 'CREATED BY',
       },
       {
-        key: 'DATA_CREARE',
-        heading: 'DATA CREARE',
+        key: 'updatedAt',
+        heading: 'UPDATED AT',
       },
       {
-        key: 'UTILIZATOR_CREARE',
-        heading: 'UTILIZATOR CREARE',
-      },
-      {
-        key: 'DATA_MODIFICARE',
-        heading: 'DATA MODIFICARE',
-      },
-      {
-        key: 'UTILIZATOR_MODIFICARE',
-        heading: 'UTILIZATOR MODIFICARE',
+        key: 'updatedBy',
+        heading: 'UPDATED BY',
       },
     ],
-    primary_key_set: ['DENUMIRE'], // this is optional and to be used only if the table is editable
+    // primary_key_set: ['DENUMIRE'], // this is optional and to be used only if the table is editable
     ediTable: {
       // this is optional
       add: true, // this determines if the "Add New Row" button will be displayed
@@ -86,9 +76,9 @@ export class TeamsComponent implements OnInit, AfterViewInit {
     this.dataSource = new MatTableDataSource(this.teams);
   }
   ngOnInit(): void {
-    this.getAllTeams();
+    this.getTeams();
     this.teamService.RefreshRequired.subscribe((res) => {
-     !this.showActive? this.getAllTeams() : this.getActiveTeams();
+     !this.showActive? this.getTeams() : this.getTeams(true)
     });
   }
   ngAfterViewInit() {
@@ -99,62 +89,40 @@ export class TeamsComponent implements OnInit, AfterViewInit {
   isDate(d: string): boolean {
     return !isNaN(Date.parse(d));
   }
-
-  getAllTeams() {
-    this.teamService.getAllTeams().subscribe((res: any) => {
-      this.teams = res.DATA;
+  
+// if active is true, get only active teams, else get all teams
+  getTeams(active: boolean=false){
+    this.teamService.getTeams(active).subscribe((res: any) => {
+      this.teams = res;
       this.dataSource = new MatTableDataSource(this.teams);
       this.dataSource.paginator = this.paginator;
       this.dataSource.sort = this.sort;
-    });
-  }
-
-  getActiveTeams() {
-    this.teamService.getActiveTeams().subscribe((res: any) =>{
-      this.teams = res.DATA;
-      this.dataSource = new MatTableDataSource(this.teams);
-      this.dataSource.paginator = this.paginator;
-      this.dataSource.sort = this.sort
     })
   }
 
   onShowActive(e: any){
     this.showActive = e.checked
-    if(e.checked){
-      this.getActiveTeams()
+    if(this.showActive){
+      this.getTeams(true)
     }
     else{
-      this.getAllTeams()
+      this.getTeams()
     }
   }
   onEditTeam(team: Team) {
     this.openDialog(team);
   }
 
-  restoreTeam(team: Team) {
-    console.log('restoring', team);
-    let body = { ID_ECHIPA: team.ID_ECHIPA };
-    this.teamService.restoreTeam(body).subscribe({
+  toggleTeamActiveState(id: string, updatedBy: string) {
+    this.teamService.toggleTeamActiveState(id, updatedBy).subscribe({
       next: (res) => {
         console.log(res);
       },
       error: (err) => {
         alert(err);
-      },
-    });
-  }
+      }
+    })
 
-  deleteTeam(team: Team) {
-    console.log('deleting', team);
-    let body = { ID_ECHIPA: team.ID_ECHIPA };
-    this.teamService.deleteTeam(body).subscribe({
-      next: (res) => {
-        console.log(res);
-      },
-      error: (err) => {
-        alert(err);
-      },
-    });
   }
   openDialog(team: Team) {
     this.dialog.open(EditComponent, {

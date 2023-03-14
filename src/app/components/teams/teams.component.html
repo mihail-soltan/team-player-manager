@@ -38,7 +38,7 @@
       <th mat-header-cell *matHeaderCellDef mat-sort-header>
         {{ column.heading }}
       </th>
-      <td mat-cell *matCellDef="let row" [ngClass]="{'green': row[column.key] ==='ACTIV', 'red': row[column.key]==='INACTIV'}">
+      <td mat-cell *matCellDef="let row" [ngClass]="{'green': row[column.key] === true, 'red': row[column.key]===false}">
         
           {{
             isDate(row[column.key])
@@ -69,10 +69,10 @@
           matTooltip="Edit Row"
           matTooltipPosition="left"
           aria-label="Edit Row"
-          (click)="row.ACTIV ? deleteTeam(row) : restoreTeam(row)"
+          (click)="toggleTeamActiveState(row._id, 'Pink Guy')"
         >
           <mat-icon class="material-symbols-outlined">
-            {{ row.ACTIV ? "delete" : "settings_backup_restore" }}
+            {{ row.active ? "delete" : "settings_backup_restore" }}
           </mat-icon>
         </button>
       </td>

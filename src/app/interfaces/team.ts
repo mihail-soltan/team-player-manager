@@ -1,10 +1,9 @@
 export interface Team {
-    STATUS: string,
-    ID_ECHIPA: number,
-    DENUMIRE: string,
-    ACTIV: boolean,
-    DATA_CREARE: Date,
-    UTILIZATOR_CREARE: number,
-    DATA_MODIFICARE: Date,
-    UTILIZATOR_MODIFICARE: number 
+    _id: string,
+    name: string,
+    active: boolean,
+    createdAt: Date,
+    createdBy: string,
+    updatedAt: Date,
+    updatedBy: string
 }

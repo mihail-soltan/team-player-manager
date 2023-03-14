@@ -27,19 +27,19 @@ export class EditComponent implements OnInit {
   allTeams: Team[] = [];
   ngOnInit(): void {
     if (this.data.type === 'team' && this.data.action === 'edit') {
-      this.teamId = this.data.team.ID_ECHIPA;
-      this.teamName = this.data.team.DENUMIRE;
+      this.teamId = this.data.team._id;
+      this.teamName = this.data.team.name;
     }
     if (this.data.type === 'player' && this.data.action === 'edit') {
-      this.playerId = this.data.player.ID_JUCATOR;
-      this.firstName = this.data.player.PRENUME;
-      this.lastName = this.data.player.NUME;
-      let oldDateFormat = this.data.player.DATA_NASTERE.split('.');
+      this.playerId = this.data.player._id;
+      this.firstName = this.data.player.firstName;
+      this.lastName = this.data.player.lastName;
+      let oldDateFormat = this.data.player.dateOfBirth.split('.');
       let newDateFormat =
         oldDateFormat[1] + ' ' + oldDateFormat[0] + ' ' + oldDateFormat[2];
       this.dateOfBirth = new Date(newDateFormat);
-      this.teamId = this.data.player.ECHIPA.ID_ECHIPA;
-      this.teamName = this.data.player.ECHIPA.DENUMIRE;
+      this.teamId = this.data.player.team._id;
+      this.teamName = this.data.player.team._id;
     }
     this.teamService.getAllTeams().subscribe((res: any) => {
       this.allTeams = res.DATA;

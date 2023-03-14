@@ -6,9 +6,10 @@ import { Observable, Subject, tap } from 'rxjs';
   providedIn: 'root'
 })
 export class TeamService {
-  teamsUrl: string = 'https://recrutare.compexin.ro/api/web/echipemihail';
+  // teamsUrl: string = 'https://recrutare.compexin.ro/api/web/echipemihail';
+  teamsUrl: string = "https://team-manager-backend-production.up.railway.app/teams"
   restoreTeamUrl: string = 'https://recrutare.compexin.ro/api/web/echipemihail/restore';
-  activeTeamsUrl: string = 'https://recrutare.compexin.ro/api/web/echipemihail/active';
+  activeTeamsUrl: string = `${this.teamsUrl}/active`
 
   constructor(private http: HttpClient) { }
 
@@ -23,6 +24,10 @@ export class TeamService {
 
   getActiveTeams():Observable<object>{
     return this.http.get(this.activeTeamsUrl)
+  }
+
+  getTeams(active: boolean = false):Observable<object> {
+    return this.http.get(active? this.activeTeamsUrl : this.teamsUrl)
   }
 
   editTeam(body: any){
@@ -55,5 +60,14 @@ export class TeamService {
         this.RefreshRequired.next()
       })
     )   
+  }
+
+  toggleTeamActiveState(teamId: any, updatedBy: string){
+    const url = `${this.teamsUrl}/${teamId}/active`
+    return this.http.put(url, {body: updatedBy}).pipe(
+      tap(()=>{
+        this.RefreshRequired.next()
+      })
+    )
   }
 }
