@@ -4,7 +4,7 @@
     <mat-label>Enter a new name</mat-label>
     <input matInput #input [(ngModel)]="teamName" required/>
   </mat-form-field>
-  <button mat-flat-button color="primary" (click)="data.action==='edit'? editTeam(teamName, data.team.ID_ECHIPA) : addTeam()">
+  <button mat-flat-button color="primary" (click)="data.action==='edit'? editTeam(teamName, data.team._id) : addTeam()">
     <span>{{ data.action | titlecase }} {{ data.type | titlecase }}</span>
     <mat-icon aria-hidden="true" class="material-icons-outlined">send</mat-icon>
   </button>
@@ -28,8 +28,8 @@
       <mat-form-field appearance="fill">
         <mat-label>Team</mat-label>
         <mat-select [(ngModel)]="teamId" name="teams" required>
-          <mat-option *ngFor="let team of allTeams" [value]="team?.ID_ECHIPA">
-            {{team.DENUMIRE}}
+          <mat-option *ngFor="let team of allTeams" [value]="team?._id">
+            {{team.name}}
           </mat-option>
         </mat-select>
       </mat-form-field>
