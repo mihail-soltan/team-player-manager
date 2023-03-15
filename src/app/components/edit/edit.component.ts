@@ -1,8 +1,8 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialog, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Team } from 'src/app/interfaces/team';
-import { TeamService } from 'src/app/services/team.service';
-import { PlayerService } from 'src/app/services/player.service';
+import { DataService } from 'src/app/services/data.service';
+
 @Component({
   selector: 'app-edit',
   templateUrl: './edit.component.html',
@@ -11,8 +11,7 @@ import { PlayerService } from 'src/app/services/player.service';
 export class EditComponent implements OnInit {
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: any,
-    private teamService: TeamService,
-    private playerService: PlayerService,
+    private dataService: DataService,
     public dialog: MatDialog
   ) {}
 
@@ -24,8 +23,8 @@ export class EditComponent implements OnInit {
   dateOfBirth?: Date;
   newDate = new Date();
   allTeams: Team[] = [];
+  
   ngOnInit(): void {
-    console.log(this.data);
     if (this.data.type === 'team' && this.data.action === 'edit') {
       this.teamId = this.data.team._id;
       this.teamName = this.data.team.name;
@@ -34,17 +33,13 @@ export class EditComponent implements OnInit {
       this.playerId = this.data.player._id;
       this.firstName = this.data.player.firstName;
       this.lastName = this.data.player.lastName;
-      let oldDateFormat = this.data.player.dateOfBirth.split('.');
-      let newDateFormat =
-        oldDateFormat[1] + ' ' + oldDateFormat[0] + ' ' + oldDateFormat[2];
-      this.dateOfBirth = new Date(newDateFormat);
+      this.dateOfBirth = this.data.player.dateOfBirth;
       this.teamId = this.data.player.team._id;
       this.teamName = this.data.player.team._id;
     }
-    this.teamService.getAllTeams().subscribe((res: any) => {
-      this.allTeams = res.DATA;
+    this.dataService.getTeams().subscribe((res: any) => {
+      this.allTeams = res;
     });
-    console.log(this.data);
   }
 
   editTeam(data: any) {
@@ -54,7 +49,7 @@ export class EditComponent implements OnInit {
       updatedAt: Date.now(),
       updatedBy: data.currentUser,
     };
-    this.teamService.editTeam(body).subscribe({
+    this.dataService.editTeam(body).subscribe({
       next: (res) => {
         console.log(res);
       },
@@ -68,7 +63,7 @@ export class EditComponent implements OnInit {
   addTeam(data: any) {
     if (this.teamName) {
       let body = { name: this.teamName, createdBy: data.currentUser };
-      this.teamService.addTeam(body).subscribe({
+      this.dataService.addTeam(body).subscribe({
         next: (res) => {
           console.log(res);
         },
@@ -82,21 +77,17 @@ export class EditComponent implements OnInit {
     }
   }
 
-  editPlayer() {
-    let dateFormat = this.dateOfBirth
-      ?.toLocaleString()
-      .split(',')[0]
-      .split('/');
-    let newDateOfBirth =
-      dateFormat![0] + '.' + dateFormat![1] + '.' + dateFormat![2];
+  editPlayer(data: any) {
     let body = {
-      ID_JUCATOR: this.playerId,
-      ID_ECHIPA: this.teamId,
-      NUME: this.lastName,
-      PRENUME: this.firstName,
-      DATA_NASTERE: newDateOfBirth,
+      _id: data.player._id,
+      firstName: this.firstName,
+      lastName: this.lastName,
+      team: this.teamId,
+      dateOfBirth: this.dateOfBirth,
+      updatedAt: Date.now(),
+      updatedBy: data.currentUser,
     };
-    this.playerService.editPlayer(body).subscribe({
+    this.dataService.editPlayer(body).subscribe({
       next: (res) => {
         console.log(res);
       },
@@ -109,20 +100,17 @@ export class EditComponent implements OnInit {
 
   addPlayer() {
     if (this.firstName && this.lastName && this.dateOfBirth && this.teamId) {
-      let dateFormat = this.dateOfBirth
-        ?.toLocaleString()
-        .split(',')[0]
-        .split('/');
-      let newDateOfBirth =
-        dateFormat![0] + '.' + dateFormat![1] + '.' + dateFormat![2];
       let body = {
-        NUME: this.lastName,
-        PRENUME: this.firstName,
-        DATA_NASTERE: newDateOfBirth,
-        ID_ECHIPA: this.teamId,
+        firstName: this.firstName,
+        lastName: this.lastName,
+        dateOfBirth: this.dateOfBirth,
+        team: this.teamId,
+        createdBy: this.data.currentUser,
       };
-      this.playerService.addPlayer(body).subscribe({
-        next: (res) => {},
+      this.dataService.addPlayer(body).subscribe({
+        next: (res) => {
+          console.log(res);
+        },
         error: (err) => {
           alert(err);
         },

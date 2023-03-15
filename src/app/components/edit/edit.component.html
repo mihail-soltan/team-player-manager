@@ -33,7 +33,7 @@
           </mat-option>
         </mat-select>
       </mat-form-field>
-    <button mat-flat-button color="primary" (click)="data.action==='edit'?editPlayer():addPlayer()">
+    <button mat-flat-button color="primary" (click)="data.action==='edit'?editPlayer(data):addPlayer()">
       <span>{{ data.action | titlecase }} {{ data.type | titlecase }}</span>
       <mat-icon aria-hidden="true" class="material-icons-outlined">send</mat-icon>
     </button>
