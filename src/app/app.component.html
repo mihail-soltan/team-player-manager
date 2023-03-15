@@ -9,7 +9,7 @@
   </button>
   <span>Team & Player Manager</span>
   <span class="spacer"></span>
-  <span>Welcome, {{ username }}</span>
+  <span *ngIf="currentUser.length">Welcome, {{ currentUser }}</span>
 </mat-toolbar>
 
 <mat-sidenav-container>

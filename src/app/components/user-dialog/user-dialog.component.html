@@ -1,0 +1,11 @@
+<h1 mat-dialog-title>Enter Your Preferred Username</h1>
+<div  mat-dialog-content class="user-dialog">
+  <mat-form-field aria-required="true" appearance="fill">
+    <mat-label>Enter Username</mat-label>
+    <input matInput #input [(ngModel)]="currentUsername" required/>
+  </mat-form-field>
+  <button mat-flat-button color="primary" (click)="addUser()">
+    <span>Add user</span>
+    <mat-icon aria-hidden="true" class="material-icons-outlined">person_add</mat-icon>
+  </button>
+</div>

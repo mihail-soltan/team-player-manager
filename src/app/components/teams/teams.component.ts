@@ -10,7 +10,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { Team } from 'src/app/interfaces/team';
-import { TeamService } from 'src/app/services/team.service';
+import { DataService } from 'src/app/services/data.service';
 import { MatDialog } from '@angular/material/dialog';
 import { EditComponent } from '../edit/edit.component';
 
@@ -73,15 +73,18 @@ export class TeamsComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  constructor(private teamService: TeamService, public dialog: MatDialog) {
+  constructor(private data: DataService, public dialog: MatDialog) {
     this.dataSource = new MatTableDataSource(this.teams);
   }
   ngOnInit(): void {
+    this.data.currentUser.subscribe((res) => {
+      this.currentUser = res;
+    });
     this.getTeams();
-    this.teamService.RefreshRequired.subscribe((res) => {
+    this.data.RefreshRequired.subscribe((res) => {
      !this.showActive? this.getTeams() : this.getTeams(true)
     });
-    this.currentUser = localStorage.getItem('currentUser') || 'Mihail';
+    console.log(this.currentUser)
   }
   ngAfterViewInit() {
     this.dataSource.paginator = this.paginator;
@@ -94,7 +97,7 @@ export class TeamsComponent implements OnInit, AfterViewInit {
   
 // if active is true, get only active teams, else get all teams
   getTeams(active: boolean=false){
-    this.teamService.getTeams(active).subscribe((res: any) => {
+    this.data.getTeams(active).subscribe((res: any) => {
       this.teams = res;
       this.dataSource = new MatTableDataSource(this.teams);
       this.dataSource.paginator = this.paginator;
@@ -113,7 +116,7 @@ export class TeamsComponent implements OnInit, AfterViewInit {
   }
 
   toggleTeamActiveState(id: string, updatedBy: string) {
-    this.teamService.toggleTeamActiveState(id, updatedBy).subscribe({
+    this.data.toggleTeamActiveState(id, updatedBy).subscribe({
       next: (res) => {
         console.log(res);
       },

@@ -23,6 +23,7 @@ import { AppComponent } from './app.component';
 import { TeamsComponent } from './components/teams/teams.component';
 import { PlayersComponent } from './components/players/players.component';
 import { EditComponent } from './components/edit/edit.component';
+import { UserDialogComponent } from './components/user-dialog/user-dialog.component';
 
 @NgModule({
   declarations: [
@@ -30,6 +31,7 @@ import { EditComponent } from './components/edit/edit.component';
     TeamsComponent,
     PlayersComponent,
     EditComponent,
+    UserDialogComponent,
   ],
   imports: [
     BrowserModule,

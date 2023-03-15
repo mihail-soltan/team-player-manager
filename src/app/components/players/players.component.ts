@@ -5,83 +5,74 @@ import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { Subject } from 'rxjs';
 import { Player } from 'src/app/interfaces/player';
-import { PlayerService } from 'src/app/services/player.service';
+import { DataService } from 'src/app/services/data.service';
 import { EditComponent } from '../edit/edit.component';
 @Component({
   selector: 'app-players',
   templateUrl: './players.component.html',
-  styleUrls: ['./players.component.css']
+  styleUrls: ['./players.component.css'],
 })
 export class PlayersComponent implements OnInit {
-
-  players: Player[] = []
+  currentUser: string = '';
+  players: Player[] = [];
   displayedColumns: string[] = [
-    'STATUS',
-    'ID_JUCATOR',
-    'ECHIPA',
-    'NUME',
-    'PRENUME',
-    'DATA_NASTERE',
-    'ACTIV',
-    'DATA_CREARE',
-    'UTILIZATOR_CREARE',
-    'DATA_MODIFICARE',
-    'UTILIZATOR_MODIFICARE',
-    'ACTION'
+    'firstName',
+    'lastName',
+    'dateOfBirth',
+    'active',
+    'team',
+    'createdAt',
+    'createdBy',
+    'updatedAt',
+    'updatedBy',
+    'ACTION',
   ];
   table_config = {
-    columns:  [
+    columns: [
       {
-        key: 'STATUS',
-        heading: 'STATUS'
+        key: 'firstName',
+        heading: 'FIRST NAME',
       },
       {
-        key: 'ID_JUCATOR',
-        heading: 'ID JUCATOR'
+        key: 'lastName',
+        heading: 'LAST NAME',
       },
       {
-        key: "ECHIPA",
-        heading: 'ECHIPA',
+        key: 'dateOfBirth',
+        heading: 'DATE OF BIRTH',
       },
       {
-        key: 'NUME',
-        heading: 'NUME',
+        key: 'active',
+        heading: 'ACTIVE',
       },
       {
-        key: 'PRENUME',
-        heading: 'PRENUME',
+        key: 'team',
+        heading: 'TEAM',
       },
       {
-        key: 'DATA_NASTERE',
-        heading: 'DATA NASTERE',
+        key: 'createdAt',
+        heading: 'CREATED AT',
       },
       {
-        key: 'ACTIV',
-        heading: 'ACTIV',
+        key: 'createdBy',
+        heading: 'CREATED BY',
       },
       {
-        key: 'DATA_CREARE',
-        heading: 'DATA CREARE',
+        key: 'updatedAt',
+        heading: 'UPDATED AT',
       },
       {
-        key: 'UTILIZATOR_CREARE',
-        heading: 'UTILIZATOR CREARE',
+        key: 'updatedBy',
+        heading: 'UPDATED BY',
       },
-      {
-        key: 'DATA_MODIFICARE',
-        heading: 'DATA MODIFICARE',
-      },
-      {
-        key: 'UTILIZATOR_MODIFICARE',
-        heading: 'UTILIZATOR MODIFICARE',
-      } 
     ],
-    primary_key_set: ['DENUMIRE'], // this is optional and to be used only if the table is editable
+    // primary_key_set: ['DENUMIRE'], // this is optional and to be used only if the table is editable
     table_data_changer: new Subject<any>(), // this is optional and to be used only if the table data needs to be refreshed
-    ediTable: { // this is optional
+    ediTable: {
+      // this is optional
       add: true, // this determines if the "Add New Row" button will be displayed
-      edit: true // this determines if the "Edit Row" button will be displayed after each row
-    }
+      edit: true, // this determines if the "Edit Row" button will be displayed after each row
+    },
   };
   dataSource!: MatTableDataSource<Player>;
   showActive: boolean = false;
@@ -89,78 +80,57 @@ export class PlayersComponent implements OnInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  constructor(private playerService: PlayerService, public dialog: MatDialog) { }
+  constructor(private data: DataService, public dialog: MatDialog) {}
 
   ngOnInit(): void {
-    this.getAllPlayers()
-    this.playerService.RefreshRequired.subscribe(res=>{
-      !this.showActive? this.getAllPlayers() : this.getActivePlayers()
-    })
+    this.data.currentUser.subscribe((res) => {
+      this.currentUser = res;
+    });
+    this.getPlayers();
+    this.data.RefreshRequired.subscribe((res) => {
+      !this.showActive ? this.getPlayers() : this.getPlayers(true);
+    });
+    console.log(this.currentUser)
   }
 
-  getAllPlayers() {
-    this.playerService.getAllPlayers().subscribe((res: any) => {
-      this.players = res.DATA;
+  getPlayers(active: boolean = false) {
+    this.data.getPlayers(active).subscribe((res: any) => {
+      this.players = res;
       this.dataSource = new MatTableDataSource(this.players);
       this.dataSource.paginator = this.paginator;
       this.dataSource.sort = this.sort;
     });
   }
 
-  getActivePlayers() {
-    this.playerService.getActivePlayers().subscribe((res: any) => {
-      this.players = res.DATA
-      this.dataSource = new MatTableDataSource(this.players);
-      this.dataSource.paginator = this.paginator;
-      this.dataSource.sort = this.sort
-    })
-  }
-
-  onShowActive(e: any){
-    this.showActive = e.checked
-    if(e.checked){
-      this.getActivePlayers()
-    }
-    else{
-      this.getAllPlayers()
+  onShowActive(e: any) {
+    this.showActive = e.checked;
+    if (e.checked) {
+      this.getPlayers(true);
+    } else {
+      this.getPlayers();
     }
   }
-  isDate(d: string) : boolean {
-    return !isNaN(Date.parse(d)) 
+  isDate(d: string): boolean {
+    return !isNaN(Date.parse(d));
   }
 
-  isObject(o: string) : boolean {
-    return typeof(o) === "object"
+  isObject(o: string): boolean {
+    return typeof o === 'object';
   }
   editPlayer(player: Player) {
-    console.log("editing", player)
+    console.log('editing', player);
     this.openDialog(player);
   }
 
-  restorePlayer(player: Player){
-    console.log("restoring" + player)
-    let body = {ID_JUCATOR: player.ID_JUCATOR}
-    this.playerService.restorePlayer(body).subscribe({
-      next: res=> {
-        console.log(res)
+  togglePlayerActiveState(id: string, updatedBy: string) {
+    this.data.togglePlayerActiveState(id, updatedBy).subscribe({
+      next: (res) => {
+        console.log(res);
       },
-      error: err =>{
-        alert(err)
-      }
-    })
-  }
-
-  deletePlayer(player: Player) {
-    console.log("deleting" + player)
-    let body = {ID_JUCATOR: player.ID_JUCATOR}
-    this.playerService.deletePlayer(body).subscribe({
-      next: res => {
-        console.log(res)
+      error: (err) => {
+        alert(err);
       },
-      error: err => {
-        alert(err)
-      }
-    })
+    });
   }
 
   openDialog(player: Player) {
@@ -168,8 +138,8 @@ export class PlayersComponent implements OnInit {
       data: {
         player,
         type: 'player',
-        action: 'edit'
-      }
+        action: 'edit',
+      },
     });
   }
 
@@ -177,10 +147,22 @@ export class PlayersComponent implements OnInit {
     this.dialog.open(EditComponent, {
       data: {
         type: 'player',
-        action: 'add'
+        action: 'add',
+      },
+    });
+  }
+
+  openAddorEditDialog(player: any = {}, currentUser: string, action: string){
+    this.dialog.open(EditComponent, {
+      data: {
+        player,
+        currentUser,
+        type: 'player',
+        action: action
       }
     })
   }
+
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
