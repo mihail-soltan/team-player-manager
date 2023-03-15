@@ -12,12 +12,15 @@ th {
   margin: 5px;
 }
 
-.mat-column-STATUS,
+/* .mat-column-STATUS,
 .mat-column-DENUMIRE,
 .mat-column-DATA_CREARE,
 .mat-column-UTILIZATOR_CREARE,
 .mat-column-ACTIV {
   width: 100px;
+} */
+.mat-elevation-z8 {
+  width: 80vw;
 }
 
 .mat-column-ACTION {

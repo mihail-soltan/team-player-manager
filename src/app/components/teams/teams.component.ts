@@ -20,6 +20,7 @@ import { EditComponent } from '../edit/edit.component';
   styleUrls: ['./teams.component.css'],
 })
 export class TeamsComponent implements OnInit, AfterViewInit {
+  currentUser: string = '';
   teams: Team[] = [];
   displayedColumns: string[] = [
     'name',
@@ -80,6 +81,7 @@ export class TeamsComponent implements OnInit, AfterViewInit {
     this.teamService.RefreshRequired.subscribe((res) => {
      !this.showActive? this.getTeams() : this.getTeams(true)
     });
+    this.currentUser = localStorage.getItem('currentUser') || 'Mihail';
   }
   ngAfterViewInit() {
     this.dataSource.paginator = this.paginator;
@@ -109,9 +111,6 @@ export class TeamsComponent implements OnInit, AfterViewInit {
       this.getTeams()
     }
   }
-  onEditTeam(team: Team) {
-    this.openDialog(team);
-  }
 
   toggleTeamActiveState(id: string, updatedBy: string) {
     this.teamService.toggleTeamActiveState(id, updatedBy).subscribe({
@@ -124,21 +123,14 @@ export class TeamsComponent implements OnInit, AfterViewInit {
     })
 
   }
-  openDialog(team: Team) {
+ 
+  openAddorEditDialog(team: any = {}, currentUser: string, action: string){
     this.dialog.open(EditComponent, {
       data: {
         team,
+        currentUser,
         type: 'team',
-        action: 'edit'
-      }
-    });
-  }
-
-  openAddDialog(){ 
-    this.dialog.open(EditComponent, {
-      data: {
-        type: 'team',
-        action: 'add'
+        action: action
       }
     })
   }
