@@ -18,7 +18,6 @@ export class EditComponent implements OnInit {
 
   teamId?: number;
   teamName: string = '';
-
   playerId?: number;
   firstName: string = '';
   lastName: string = '';
@@ -26,6 +25,7 @@ export class EditComponent implements OnInit {
   newDate = new Date();
   allTeams: Team[] = [];
   ngOnInit(): void {
+    console.log(this.data);
     if (this.data.type === 'team' && this.data.action === 'edit') {
       this.teamId = this.data.team._id;
       this.teamName = this.data.team.name;
@@ -47,9 +47,13 @@ export class EditComponent implements OnInit {
     console.log(this.data);
   }
 
-  editTeam(name: string, id: number) {
-    console.log(name, id);
-    let body = { ID_ECHIPA: id, DENUMIRE: name };
+  editTeam(data: any) {
+    let body = {
+      _id: data.team._id,
+      name: this.teamName,
+      updatedAt: Date.now(),
+      updatedBy: data.currentUser,
+    };
     this.teamService.editTeam(body).subscribe({
       next: (res) => {
         console.log(res);
@@ -61,19 +65,18 @@ export class EditComponent implements OnInit {
     this.dialog.closeAll();
   }
 
-  addTeam() {
+  addTeam(data: any) {
     if (this.teamName) {
-      console.log('adding team');
-      let body = { DENUMIRE: this.teamName };
+      let body = { name: this.teamName, createdBy: data.currentUser };
       this.teamService.addTeam(body).subscribe({
         next: (res) => {
-          console.log(res)
+          console.log(res);
         },
         error: (err) => {
           alert(err);
         },
       });
-      this.dialog.closeAll()
+      this.dialog.closeAll();
     } else {
       alert('Team Name is required');
     }
@@ -107,11 +110,11 @@ export class EditComponent implements OnInit {
   addPlayer() {
     if (this.firstName && this.lastName && this.dateOfBirth && this.teamId) {
       let dateFormat = this.dateOfBirth
-      ?.toLocaleString()
-      .split(',')[0]
-      .split('/');
-    let newDateOfBirth =
-      dateFormat![0] + '.' + dateFormat![1] + '.' + dateFormat![2];
+        ?.toLocaleString()
+        .split(',')[0]
+        .split('/');
+      let newDateOfBirth =
+        dateFormat![0] + '.' + dateFormat![1] + '.' + dateFormat![2];
       let body = {
         NUME: this.lastName,
         PRENUME: this.firstName,
@@ -119,12 +122,10 @@ export class EditComponent implements OnInit {
         ID_ECHIPA: this.teamId,
       };
       this.playerService.addPlayer(body).subscribe({
-        next: (res) =>{
-
+        next: (res) => {},
+        error: (err) => {
+          alert(err);
         },
-        error: (err) =>{
-          alert(err)
-        }
       });
       this.dialog.closeAll();
     } else {

@@ -31,7 +31,8 @@ export class TeamService {
   }
 
   editTeam(body: any){
-    return this.http.put(this.teamsUrl, body).pipe(
+    const url = `${this.teamsUrl}/${body._id}`
+    return this.http.put(url, body).pipe(
       tap(()=>{
         this.RefreshRequired.next()
       })
@@ -64,7 +65,7 @@ export class TeamService {
 
   toggleTeamActiveState(teamId: any, updatedBy: string){
     const url = `${this.teamsUrl}/${teamId}/active`
-    return this.http.put(url, {body: updatedBy}).pipe(
+    return this.http.put(url, {updatedBy: updatedBy}).pipe(
       tap(()=>{
         this.RefreshRequired.next()
       })
