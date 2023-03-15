@@ -7,7 +7,7 @@
           matTooltip="Add New Row"
           matTooltipPosition="right"
           aria-label="Add New Row"
-          (click)="openAddDialog()"
+          (click)="openAddorEditDialog({}, currentUser, 'add' )"
           >
           Add New Player
           <mat-icon class="material-icons">
@@ -39,15 +39,15 @@
         *matCellDef="let row"
         mat-cell
         [ngClass]="{
-          green: row[column.key] === 'ACTIV',
-          red: row[column.key] === 'INACTIV'
+          green: row[column.key] === true,
+          red: row[column.key] === false
         }"
       >
         {{
           isDate(row[column.key])
             ? (row[column.key] | date: "mediumDate")
-            : row[column.key]?.DENUMIRE || row[column.key]
-        }}
+            : row[column.key]?.name || row[column.key]
+        }} 
       </td>
     </ng-container>
     <ng-container matColumnDef="ACTION">
@@ -60,7 +60,7 @@
           matTooltip="Edit Row"
           matTooltipPosition="left"
           aria-label="Edit Row"
-          (click)="editPlayer(row)"
+          (click)="openAddorEditDialog(row, currentUser, 'edit')"
         >
           <mat-icon aria-hidden="true" class="material-icons-outlined"
             >edit</mat-icon
@@ -72,10 +72,10 @@
           matTooltip="Edit Row"
           matTooltipPosition="left"
           aria-label="Edit Row"
-          (click)="row.ACTIV ? deletePlayer(row) : restorePlayer(row)"
+          (click)="togglePlayerActiveState(row._id, currentUser)"
         >
           <mat-icon class="material-symbols-outlined">
-            {{ row.ACTIV ? "delete" : "settings_backup_restore" }}
+            {{ row.active ? "delete" : "settings_backup_restore" }}
           </mat-icon>
         </button>
       </td>
